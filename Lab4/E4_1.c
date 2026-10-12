@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+double sqrt(double);
+
 int main(void)
 {
     printf("sqrt(49.0)              = %.4f\n", sqrt(49.0));
