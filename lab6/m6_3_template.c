@@ -1,18 +1,63 @@
 #include <stdio.h>
 
-/* TEMPLATE: replace the record fields and the rule with YOUR project's
-   classifying rule from your idea-submission form.
-   Example domain here: a stock item that is "due for attention"
-   when quantity is below its reorder level. */
+void Banner(void)
+{
+    printf("========================================\n");
+    printf("        PARKING LOT MANAGER\n");
+    printf("   Cars in, cars out, fair charges\n");
+    printf("========================================\n\n");
+}
 
-#define REORDER_LEVEL 10
 
-/* returns 1 if the record needs attention, 0 otherwise */
-int needs_attention(int quantity)
+void Menu(double rate_per_hour)
+{
+    printf("---------------- MENU ------------------\n");
+    printf("  1. Park a vehicle\n");
+    printf("  2. Release and charge   <-- this version\n");
+    printf("  3. Show free slots\n");
+    printf("  4. Search by plate\n");
+    printf("  5. Day's earnings\n");
+    printf("  6. Save & load\n");
+    printf("  0. Exit\n");
+    printf("----------------------------------------\n");
+    printf("Rate: %.2f taka per hour (part hour rounds up)\n\n", rate_per_hour);
+    printf("Choose an option: 2 \n\n");
+
+    printf("========================================\n");
+    printf("        RELEASE AND CHARGE\n");
+    printf("       ENTER VEHICLE DETAILS\n");
+    printf("========================================\n\n");
+}
+
+
+int read_number(void)
+{
+    int value;
+
+    scanf("%d", &value);
+    return value;
+}
+
+
+int calc_hours(int minutes)
+{
+    return (minutes + 59) / 60;
+}
+
+
+double calc_charge(int hours, double rate_per_hour)
+{
+    return hours * rate_per_hour;
+}
+
+
+/* M6.3: one decision, one if with two alternatives.
+   Returns 1 if the charge is over the threshold, otherwise 0. */
+int is_high_charge(double charge, double threshold)
 {
     int result;
 
-    if (quantity < REORDER_LEVEL)
+    if (charge > threshold)
         result = 1;
     else
         result = 0;
@@ -20,19 +65,77 @@ int needs_attention(int quantity)
     return result;
 }
 
+
+void show_receipt(int slot, int number, int type,
+                  int minutein, int minuteout,
+                  int minutes, int hours, double charge)
+{
+    printf("\n--------------- RECEIPT ----------------\n");
+    printf("  Slot no.       : %d\n", slot);
+    printf("  Vehicle number : %d\n", number);
+    printf("  Vehicle type   : %d\n", type);
+    printf("  Minute in      : %d\n", minutein);
+    printf("  Minute out     : %d\n", minuteout);
+    printf("  Time parked    : %d min\n", minutes);
+    printf("  Billed hours   : %d\n", hours);
+    printf("  Charge         : %.2f taka\n", charge);
+    printf("----------------------------------------\n");
+}
+
 int main(void)
 {
-    int id = 101;          /* use a record from your Version 3 */
-    int quantity = 7;
+    int slot;
+    int number;
+    int type;
+    int minutein;
+    int minuteout;
+    double charge;
 
-    printf("Record: id %d, quantity %d\n", id, quantity);
+    int minutes;
+    int hours;
+    double rate_per_hour = 30.0;
 
-    if (needs_attention(quantity))
-        printf("Verdict: DUE FOR ATTENTION\n");
+    int high;
+    double threshold = 150.0;
+
+    Banner();
+    Menu(rate_per_hour);
+
+
+    printf("Slot number            : ");
+    slot = read_number();
+
+    printf("Vehicle number    : ");
+    number = read_number();
+
+    printf("-------------- Vehicle type -----------------\n");
+    printf("  1. Car\n");
+    printf("  2. Bike\n");
+    printf("  3. Bicycle\n");
+    printf("Vehicle type          : ");
+    type = read_number();
+
+    printf("Minute in            : ");
+    minutein = read_number();
+
+    printf("Minute out           : ");
+    minuteout = read_number();
+
+
+    minutes = minuteout - minutein;
+    hours = calc_hours(minutes);
+    charge = calc_charge(hours, rate_per_hour);
+    high = is_high_charge(charge, threshold);
+
+
+    show_receipt(slot, number, type, minutein, minuteout, minutes, hours, charge);
+
+    /* M6.3: print the record and the verdict */
+    printf("Charge %.2f taka vs threshold %.2f taka: ", charge, threshold);
+    if (high == 1)
+        printf("HIGH CHARGE\n");
     else
-        printf("Verdict: OK\n");
+        printf("NORMAL CHARGE\n");
 
     return 0;
 }
-
-/* https://claude.ai/share/7e64f3d6-bff6-48a6-9682-b384360199d6 */
